@@ -18,6 +18,19 @@
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 
+# hunter initialize 
+include ("cmake_aux/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/CHChang810716/hunter/archive/master.zip"
+    SHA1 "fd2df2c16cfec82a376c2d2f3641ddd0b132f811"
+)
+hunter_add_package( OpenBLAS )
+hunter_add_package( CLAPACK )
+hunter_add_package( LAPACK )
+hunter_add_package( hdf5 )
+# hunter initialize done
+
+
 project(armadillo CXX C)
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
