@@ -24,10 +24,6 @@ HunterGate(
     URL "https://github.com/CHChang810716/hunter/archive/master.zip"
     SHA1 "fd2df2c16cfec82a376c2d2f3641ddd0b132f811"
 )
-hunter_add_package( OpenBLAS )
-hunter_add_package( CLAPACK )
-hunter_add_package( LAPACK )
-hunter_add_package( hdf5 )
 # hunter initialize done
 
 
@@ -107,7 +103,12 @@ message(STATUS "CMAKE_COMPILER_IS_GNUCXX   = ${CMAKE_COMPILER_IS_GNUCXX}"  )
 message(STATUS "BUILD_SHARED_LIBS          = ${BUILD_SHARED_LIBS}"         )
 message(STATUS "DETECT_PKG_CONFIG          = ${DETECT_PKG_CONFIG}"         )
 message(STATUS "DETECT_HDF5                = ${DETECT_HDF5}"               )
-
+# hunger package add
+hunter_add_package( OpenBLAS )
+hunter_add_package( CLAPACK )
+hunter_add_package( LAPACK )
+hunter_add_package( hdf5 )
+# hunger package add done
 
 ##
 ## Find LAPACK and BLAS libraries, or their optimised versions
