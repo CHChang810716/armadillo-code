@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/CHChang810716/hunter/archive/master.zip"
-    SHA1 "fd2df2c16cfec82a376c2d2f3641ddd0b132f811"
+    SHA1 "8c4446d8c09b49e5f644540d447806e10d8cd6ed"
 )
 # hunter initialize done
 
@@ -107,7 +107,10 @@ message(STATUS "DETECT_HDF5                = ${DETECT_HDF5}"               )
 hunter_add_package( OpenBLAS )
 hunter_add_package( CLAPACK )
 hunter_add_package( LAPACK )
-hunter_add_package( hdf5 )
+hunter_add_package( ARPACK )
+if ( ${DETECT_HDF5} )
+    hunter_add_package( hdf5 )
+endif()
 # hunger package add done
 
 ##
