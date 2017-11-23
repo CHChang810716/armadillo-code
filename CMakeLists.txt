@@ -21,8 +21,8 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 # hunter initialize 
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/CHChang810716/hunter/archive/master.zip"
-    SHA1 "8c4446d8c09b49e5f644540d447806e10d8cd6ed"
+    URL "https://github.com/CHChang810716/hunter/archive/41cf2257ab6c91a785a5766f6468ffad037e0558.zip"
+    SHA1 "5c7deda94b667dd3883954c0513f2a3243179b36"
 )
 # hunter initialize done
 
