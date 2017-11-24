@@ -372,6 +372,7 @@ message(STATUS "CMAKE_SHARED_LINKER_FLAGS = ${CMAKE_SHARED_LINKER_FLAGS}")
 message(STATUS "CMAKE_REQUIRED_INCLUDES   = ${CMAKE_REQUIRED_INCLUDES}"  )
 
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library( armadillo ${PROJECT_SOURCE_DIR}/src/wrapper.cpp )
 target_link_libraries( armadillo ${ARMA_LIBS} )
 target_include_directories(armadillo INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
