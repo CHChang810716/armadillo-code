@@ -115,6 +115,16 @@ if ( ${DETECT_HDF5} )
 endif()
 # hunger package add done
 
+# process high level library first
+include(ARMA_FindARPACK)
+# find_package( arpack-ng CONFIG REQUIRED )
+message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
+
+if(ARPACK_FOUND)
+  set(ARMA_USE_ARPACK true)
+  set(ARMA_LIBS ${ARMA_LIBS} ${ARPACK_LIBRARY})
+endif()
+
 ##
 ## Find LAPACK and BLAS libraries, or their optimised versions
 ##
@@ -314,14 +324,6 @@ if(DETECT_HDF5)
   endif()
 endif()
 
-include(ARMA_FindARPACK)
-# find_package( arpack-ng CONFIG REQUIRED )
-message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
-
-if(ARPACK_FOUND)
-  set(ARMA_USE_ARPACK true)
-  set(ARMA_LIBS ${ARMA_LIBS} ${ARPACK_LIBRARY})
-endif()
 
 include(ARMA_FindSuperLU5)
 message(STATUS "SuperLU_FOUND = ${SuperLU_FOUND}")
