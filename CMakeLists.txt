@@ -21,15 +21,17 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 # hunter initialize 
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/CHChang810716/hunter/archive/06289a3afda0931d1dc3920262b2e59aa524a6ec.zip"
-    SHA1 "af80fa6c2ff38cb6fec0aebb333d26d025e89548"
+    URL "https://github.com/CHChang810716/hunter/archive/6828af7fc035d189b388a4b4904f08faf650d04d.zip"
+    SHA1 "1b4b804d563a84c997e158760fd89505cf99835e"
+    FILEPATH "${CMAKE_CURRENT_LIST_DIR}/config.cmake"
 )
 # hunter initialize done
 
 
-project(armadillo CXX C)
+project(armadillo CXX C Fortran)
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
+include(FortranCInterface)
 
 ## Set ARMA_USE_WRAPPER to false if you're getting linking errors when compiling your programs,
 ## or if you prefer to directly link with BLAS and/or LAPACK.
@@ -105,7 +107,7 @@ message(STATUS "DETECT_PKG_CONFIG          = ${DETECT_PKG_CONFIG}"         )
 message(STATUS "DETECT_HDF5                = ${DETECT_HDF5}"               )
 # hunger package add
 hunter_add_package( OpenBLAS )
-hunter_add_package( CLAPACK )
+# hunter_add_package( CLAPACK )
 hunter_add_package( LAPACK )
 hunter_add_package( ARPACK )
 if ( ${DETECT_HDF5} )
@@ -139,10 +141,24 @@ else()
   include(ARMA_FindMKL)
   include(ARMA_FindACMLMP)
   include(ARMA_FindACML)
-  include(ARMA_FindOpenBLAS)
   include(ARMA_FindATLAS)
-  include(ARMA_FindBLAS)
-  include(ARMA_FindLAPACK)
+  find_package( OpenBLAS CONFIG REQUIRED )
+  find_package( LAPACK CONFIG REQUIRED )
+  # set( LAPACK_FOUND ${CLAPACK_FOUND} )
+
+  # display prettify
+  if ( ${OpenBLAS_FOUND} )
+    set(OpenBLAS_FOUND "YES")
+  else()
+    set(OpenBLAS_FOUND "NO")
+  endif()
+  if ( ${LAPACK_FOUND} )
+    set( LAPACK_FOUND "YES" )
+    set( BLAS_FOUND "YES" )
+  else()
+    set( LAPACK_FOUND "NO" )
+    set( BLAS_FOUND "NO" )
+  endif()
   
   message(STATUS "     MKL_FOUND = ${MKL_FOUND}"     )
   message(STATUS "  ACMLMP_FOUND = ${ACMLMP_FOUND}"  )
@@ -212,7 +228,7 @@ else()
     if(OpenBLAS_FOUND)
       
       set(ARMA_USE_BLAS true)
-      set(ARMA_LIBS ${ARMA_LIBS} ${OpenBLAS_LIBRARIES})
+      set(ARMA_LIBS ${ARMA_LIBS} OpenBLAS::OpenBLAS)
       
       message(STATUS "")
       message(STATUS "*** If the OpenBLAS library is installed in")
@@ -234,14 +250,14 @@ else()
       
       if(BLAS_FOUND)
         set(ARMA_USE_BLAS true)
-        set(ARMA_LIBS ${ARMA_LIBS} ${BLAS_LIBRARIES})
+        set(ARMA_LIBS ${ARMA_LIBS} blas)
       endif()
       
     endif()
     
     if(LAPACK_FOUND)
       set(ARMA_USE_LAPACK true)
-      set(ARMA_LIBS ${ARMA_LIBS} ${LAPACK_LIBRARIES})
+      set(ARMA_LIBS ${ARMA_LIBS} lapack)
     endif()
       
   endif()
@@ -299,6 +315,7 @@ if(DETECT_HDF5)
 endif()
 
 include(ARMA_FindARPACK)
+# find_package( arpack-ng CONFIG REQUIRED )
 message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
 
 if(ARPACK_FOUND)
@@ -371,8 +388,9 @@ message(STATUS "CMAKE_CXX_FLAGS           = ${CMAKE_CXX_FLAGS}"          )
 message(STATUS "CMAKE_SHARED_LINKER_FLAGS = ${CMAKE_SHARED_LINKER_FLAGS}")
 message(STATUS "CMAKE_REQUIRED_INCLUDES   = ${CMAKE_REQUIRED_INCLUDES}"  )
 
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+if( NOT ${BUILD_SHARED_LIBS} )
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
 add_library( armadillo ${PROJECT_SOURCE_DIR}/src/wrapper.cpp )
 target_link_libraries( armadillo ${ARMA_LIBS} )
 target_include_directories(armadillo INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
