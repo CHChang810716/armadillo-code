@@ -8,6 +8,9 @@
 set(ARMADILLO_INCLUDE_DIRS "@ARMADILLO_INCLUDE_DIRS@")
 set(ARMADILLO_LIBRARY_DIRS "@ARMADILLO_LIB_DIR@")
 
+find_package( OpenBLAS CONFIG REQUIRED )
+find_package( LAPACK CONFIG REQUIRED )
+
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("@ARMADILLO_CMAKE_DIR@/ArmadilloLibraryDepends.cmake")
 
