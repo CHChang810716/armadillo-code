@@ -21,17 +21,19 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 # hunter initialize 
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/CHChang810716/hunter/archive/master.zip"
-    SHA1 "fd2df2c16cfec82a376c2d2f3641ddd0b132f811"
+    URL "https://github.com/CHChang810716/hunter/archive/27317dadaa63cefea1bd58a3807b4c5324ee66e6.zip"
+    SHA1 "5F7CB58F5E4EBC29ECC694D2C2E669B9C5CAC1A7"
 )
+# hunter initialize done
+
+
+project(armadillo CXX C Fortran)
+
 hunter_add_package( OpenBLAS )
 hunter_add_package( CLAPACK )
 hunter_add_package( LAPACK )
 hunter_add_package( hdf5 )
-# hunter initialize done
 
-
-project(armadillo CXX C)
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
 
@@ -187,10 +189,12 @@ else()
   include(ARMA_FindMKL)
   include(ARMA_FindACMLMP)
   include(ARMA_FindACML)
-  include(ARMA_FindOpenBLAS)
+  # include(ARMA_FindOpenBLAS)
   include(ARMA_FindATLAS)
-  include(ARMA_FindBLAS)
-  include(ARMA_FindLAPACK)
+  # include(ARMA_FindBLAS)
+  # include(ARMA_FindLAPACK)
+  find_package(OpenBLAS CONFIG REQUIRED)
+  find_package(LAPACK CONFIG REQUIRED)
   
   message(STATUS "     MKL_FOUND = ${MKL_FOUND}"     )
   message(STATUS "  ACMLMP_FOUND = ${ACMLMP_FOUND}"  )
@@ -260,7 +264,7 @@ else()
     if(OpenBLAS_FOUND)
       
       set(ARMA_USE_BLAS true)
-      set(ARMA_LIBS ${ARMA_LIBS} ${OpenBLAS_LIBRARIES})
+      set(ARMA_LIBS ${ARMA_LIBS} OpenBLAS::OpenBLAS)
       
       message(STATUS "")
       message(STATUS "*** If the OpenBLAS library is installed in")
@@ -375,10 +379,12 @@ message(STATUS "")
 
 
 if(DEFINED CMAKE_CXX_COMPILER_ID AND DEFINED CMAKE_CXX_COMPILER_VERSION)
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 4.8.3)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 7.3.0)
     set(ARMA_USE_EXTERN_CXX11_RNG true)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    message(STATUS "Detected gcc 4.8.3 or later. Added '-std=c++11' to compiler flags")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    # message(STATUS "Detected gcc 4.8.3 or later. Added '-std=c++11' to compiler flags")
+    set(CMAKE_CXX_STANDARD 17)
+    message(STATUS "Detected gcc 7.3.0 or later. Added '-std=c++17' to compiler flags")
   endif()
 endif()
 
