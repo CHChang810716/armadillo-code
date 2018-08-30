@@ -21,18 +21,14 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 # hunter initialize 
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/CHChang810716/hunter/archive/27317dadaa63cefea1bd58a3807b4c5324ee66e6.zip"
-    SHA1 "5F7CB58F5E4EBC29ECC694D2C2E669B9C5CAC1A7"
+    URL "https://github.com/CHChang810716/hunter/archive/e9a9ee70340c3ce7dc6966807c2035dfe6c0e8f7.zip"
+    SHA1 "da045b6480334cdb25ed9a95b8407bdcf0f787d8"
 )
 # hunter initialize done
 
 
 project(armadillo CXX C Fortran)
 
-hunter_add_package( OpenBLAS )
-hunter_add_package( CLAPACK )
-hunter_add_package( LAPACK )
-hunter_add_package( hdf5 )
 
 include(CheckIncludeFileCXX)
 include(CheckLibraryExists)
@@ -186,14 +182,14 @@ else()
   
   set(ARMA_OS unix)
   
+  hunter_add_package( CLAPACK )
   include(ARMA_FindMKL)
   include(ARMA_FindACMLMP)
   include(ARMA_FindACML)
-  # include(ARMA_FindOpenBLAS)
   include(ARMA_FindATLAS)
-  # include(ARMA_FindBLAS)
-  # include(ARMA_FindLAPACK)
+  hunter_add_package( OpenBLAS )
   find_package(OpenBLAS CONFIG REQUIRED)
+  hunter_add_package( LAPACK )
   find_package(LAPACK CONFIG REQUIRED)
   
   message(STATUS "     MKL_FOUND = ${MKL_FOUND}"     )
@@ -311,55 +307,51 @@ find_package(PkgConfig)
 ## cmake -D DETECT_HDF5=false .
 
 if(DETECT_HDF5)
-  find_package(HDF5 QUIET COMPONENTS C)
+  hunter_add_package( hdf5 )
+  find_package(hdf5 CONFIG REQUIRED)
+  find_package(ZLIB CONFIG REQUIRED)
+  find_package(szip CONFIG REQUIRED)
 
-  if(NOT HDF5_FOUND)
-    # On Debian systems, the HDF5 package has been split into multiple packages
-    # so that it is co-installable.  But this may mean that the include files
-    # are hidden somewhere very odd that the FindHDF5.cmake script will not
-    # find.  Thus, we'll also quickly check pkgconfig to see if there is
-    # information on what to use there.
-    if (PKG_CONFIG_FOUND)
-      pkg_check_modules(HDF5 hdf5)
-      # But using pkgconfig is a little weird because HDF5_LIBRARIES won't be
-      # filled with exact library paths, like the other scripts.  So instead
-      # what we get is HDF5_LIBRARY_DIRS which is the equivalent of what we'd
-      # pass to -L.  So we have to add those...
-      if (HDF5_FOUND)
-        link_directories("${HDF5_LIBRARY_DIRS}")
-      endif()
-    endif()
+  # On Debian systems, the HDF5 package has been split into multiple packages
+  # so that it is co-installable.  But this may mean that the include files
+  # are hidden somewhere very odd that the FindHDF5.cmake script will not
+  # find.  Thus, we'll also quickly check pkgconfig to see if there is
+  # information on what to use there.
+  if (PKG_CONFIG_FOUND)
+    pkg_check_modules(HDF5 hdf5)
+    # But using pkgconfig is a little weird because HDF5_LIBRARIES won't be
+    # filled with exact library paths, like the other scripts.  So instead
+    # what we get is HDF5_LIBRARY_DIRS which is the equivalent of what we'd
+    # pass to -L.  So we have to add those...
+    link_directories("${HDF5_LIBRARY_DIRS}")
   endif()
  
   message(STATUS "HDF5_FOUND = ${HDF5_FOUND}")
-  if(HDF5_FOUND)
-    set(ARMA_USE_HDF5_ALT true)
-    set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${HDF5_INCLUDE_DIRS})
-    set(ARMA_LIBS ${ARMA_LIBS} ${HDF5_LIBRARIES})
-    # Since we called HDF5 with no arguments, the script will find only the C
-    # bindings.  So HDF5_INCLUDE_DIRS may now contain one or two elements; if it
-    # contains two, the first is what the user passed as HDF5_INCLUDE_DIR and we
-    # should use that as ARMA_HDF5_INCLUDE_DIR.  Otherwise, the one entry in
-    # HDF5_INCLUDE_DIRS is the correct include directory.  So, in either case we
-    # can use the first element in the list.  Issue a status message, too, just
-    # for good measure.
-    list(GET HDF5_INCLUDE_DIRS 0 ARMA_HDF5_INCLUDE_DIR)
-    message(STATUS "ARMA_HDF5_INCLUDE_DIR = ${ARMA_HDF5_INCLUDE_DIR}")
-    message(STATUS "")
-    message(STATUS "*** If use of HDF5 is causing problems,")
-    message(STATUS "*** rerun cmake with HDF5 detection disabled:")
-    message(STATUS "*** cmake -D DETECT_HDF5=false .")
-    message(STATUS "")
-  endif()
+  set(ARMA_USE_HDF5_ALT true)
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${HDF5_INCLUDE_DIRS})
+  set(ARMA_LIBS ${ARMA_LIBS} hdf5-static) # TODO: use shared if hdf5 build shared?
+  # Since we called HDF5 with no arguments, the script will find only the C
+  # bindings.  So HDF5_INCLUDE_DIRS may now contain one or two elements; if it
+  # contains two, the first is what the user passed as HDF5_INCLUDE_DIR and we
+  # should use that as ARMA_HDF5_INCLUDE_DIR.  Otherwise, the one entry in
+  # HDF5_INCLUDE_DIRS is the correct include directory.  So, in either case we
+  # can use the first element in the list.  Issue a status message, too, just
+  # for good measure.
+  list(GET HDF5_INCLUDE_DIRS 0 ARMA_HDF5_INCLUDE_DIR)
+  message(STATUS "ARMA_HDF5_INCLUDE_DIR = ${ARMA_HDF5_INCLUDE_DIR}")
+  message(STATUS "")
+  message(STATUS "*** If use of HDF5 is causing problems,")
+  message(STATUS "*** rerun cmake with HDF5 detection disabled:")
+  message(STATUS "*** cmake -D DETECT_HDF5=false .")
+  message(STATUS "")
 endif()
 
-include(ARMA_FindARPACK)
+
+hunter_add_package( ARPACK-NG )
+find_package(ARPACK-NG CONFIG REQUIRED)
 message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
-
-if(ARPACK_FOUND)
-  set(ARMA_USE_ARPACK true)
-  set(ARMA_LIBS ${ARMA_LIBS} ${ARPACK_LIBRARY})
-endif()
+set(ARMA_USE_ARPACK true)
+set(ARMA_LIBS ${ARMA_LIBS} arpack::arpack)
 
 include(ARMA_FindSuperLU5)
 message(STATUS "SuperLU_FOUND = ${SuperLU_FOUND}")
@@ -446,6 +438,15 @@ message(STATUS "CMAKE_INSTALL_INCLUDEDIR = ${CMAKE_INSTALL_INCLUDEDIR}")
 message(STATUS "CMAKE_INSTALL_DATADIR    = ${CMAKE_INSTALL_DATADIR}"   )
 message(STATUS "CMAKE_INSTALL_BINDIR     = ${CMAKE_INSTALL_BINDIR}"    )
 
+include(CMakePackageConfigHelpers)
+
+set(PROJECT_VERSION     "${ARMA_VERSION_MAJOR}.${ARMA_VERSION_MINOR_ALT}.${ARMA_VERSION_PATCH}")
+set(generated_dir       "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(config_install_dir  "lib/cmake/${PROJECT_NAME}")
+set(version_config      "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config      "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace           "${PROJECT_NAME}::")
 
 # Note that the trailing / character in "include/" is critical
 
@@ -456,60 +457,32 @@ PATTERN "*~" EXCLUDE
 PATTERN "*orig" EXCLUDE
 )
 
-install(TARGETS armadillo EXPORT ArmadilloLibraryDepends
+install(TARGETS armadillo EXPORT ${targets_export_name}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-  
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export(PACKAGE armadillo)
-
-## LOCAL FILES
-# Create ArmadilloConfig.cmake file for the use from the build tree
-set(ARMADILLO_INCLUDE_DIRS "${PROJECT_BINARY_DIR}/tmp/include")
-set(ARMADILLO_LIB_DIR      "${PROJECT_BINARY_DIR}")
-set(ARMADILLO_CMAKE_DIR    "${PROJECT_BINARY_DIR}")
-
-
-message(STATUS "Generating '${PROJECT_BINARY_DIR}/ArmadilloConfig.cmake'")
-# copy/change config and configVersion file (modify only the @xyz@ variables)
-configure_file(${PROJECT_SOURCE_DIR}/cmake_aux/InstallFiles/ArmadilloConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/ArmadilloConfig.cmake" @ONLY)
-
-message(STATUS "Generating '${PROJECT_BINARY_DIR}/ArmadilloConfigVersion.cmake'")
-configure_file(${PROJECT_SOURCE_DIR}/cmake_aux/InstallFiles/ArmadilloConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/ArmadilloConfigVersion.cmake" @ONLY)
-
-# Install the export set for use with the install-tree
-install(EXPORT ArmadilloLibraryDepends DESTINATION
-  "${CMAKE_INSTALL_DATADIR}/Armadillo/CMake"
-  COMPONENT dev)
-
-
 ## GLOBAL INSTALL FILES
 # Create ArmadilloConfig.cmake file for the use from the install tree
 # and install it
-set(ARMADILLO_INCLUDE_DIRS "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
-set(ARMADILLO_LIB_DIR      "${CMAKE_INSTALL_FULL_LIBDIR}")
-set(ARMADILLO_CMAKE_DIR    "${CMAKE_INSTALL_FULL_DATADIR}/Armadillo/CMake")
+configure_package_config_file(
+  ${PROJECT_SOURCE_DIR}/cmake_aux/InstallFiles/ArmadilloConfig.cmake.in
+  "${project_config}"
+  INSTALL_DESTINATION "${config_install_dir}"
+)
 
-
-message(STATUS "Generating '${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfig.cmake'")
-# copy/change config and configVersion file (modify only the @xyz@ variables)
-configure_file(${PROJECT_SOURCE_DIR}/cmake_aux/InstallFiles/ArmadilloConfig.cmake.in
-  "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfig.cmake" @ONLY)
-
-message(STATUS "Generating '${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfigVersion.cmake'")
-configure_file(${PROJECT_SOURCE_DIR}/cmake_aux/InstallFiles/ArmadilloConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfigVersion.cmake" @ONLY)
-
-# Install files to be found by cmake users with find_package()
-install(FILES
-  "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfig.cmake"
-  "${PROJECT_BINARY_DIR}/InstallFiles/ArmadilloConfigVersion.cmake"
-  DESTINATION "${ARMADILLO_CMAKE_DIR}" COMPONENT dev)
-
+write_basic_package_version_file(
+  "${version_config}"
+  COMPATIBILITY SameMajorVersion
+)
+install(
+  FILES ${project_config} ${version_config}
+  DESTINATION ${config_install_dir}
+)
+install(
+  EXPORT "${targets_export_name}"
+  NAMESPACE "${namespace}"
+  DESTINATION "${config_install_dir}"
+)
 
 # pkgconfig related
 
