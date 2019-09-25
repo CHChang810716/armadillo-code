@@ -21,8 +21,8 @@ cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 # hunter initialize 
 include ("cmake_aux/HunterGate.cmake")
 HunterGate(
-    URL "https://github.com/CHChang810716/hunter/archive/e9a9ee70340c3ce7dc6966807c2035dfe6c0e8f7.zip"
-    SHA1 "da045b6480334cdb25ed9a95b8407bdcf0f787d8"
+    URL "https://github.com/CHChang810716/hunter/archive/bf677915a6c0bf1d711ee83f16c7fbcc59675226.zip"
+    SHA1 "422b51a1034d8c7d432b6ba5a112210ebfbbc3ac"
 )
 # hunter initialize done
 
@@ -183,6 +183,8 @@ else()
   set(ARMA_OS unix)
   
   # hunter_add_package( CLAPACK )
+  hunter_add_package(mkl)
+  message(STATUS "MKL_ROOT: ${MKL_ROOT}")
   include(ARMA_FindMKL)
   include(ARMA_FindACMLMP)
   include(ARMA_FindACML)
@@ -352,7 +354,6 @@ endif()
 
 hunter_add_package( ARPACK-NG )
 find_package(ARPACK-NG CONFIG REQUIRED)
-message(STATUS "ARPACK_FOUND = ${ARPACK_FOUND}")
 set(ARMA_USE_ARPACK true)
 set(ARMA_LIBS ${ARMA_LIBS} arpack::arpack)
 

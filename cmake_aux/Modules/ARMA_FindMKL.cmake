@@ -6,13 +6,13 @@
 ## the link below explains why we're linking only with mkl_rt
 ## https://software.intel.com/en-us/articles/a-new-linking-model-single-dynamic-library-mkl_rt-since-intel-mkl-103
 
-set(MKL_NAMES ${MKL_NAMES} mkl_rt)
+set(MKL_NAMES ${MKL_NAMES} mklml)
 #set(MKL_NAMES ${MKL_NAMES} mkl_lapack)
 #set(MKL_NAMES ${MKL_NAMES} mkl_intel_thread)
 #set(MKL_NAMES ${MKL_NAMES} mkl_core)
 #set(MKL_NAMES ${MKL_NAMES} guide)
 #set(MKL_NAMES ${MKL_NAMES} mkl)
-#set(MKL_NAMES ${MKL_NAMES} iomp5)
+set(MKL_NAMES ${MKL_NAMES} iomp5md)
 #set(MKL_NAMES ${MKL_NAMES} pthread)
 
 
@@ -24,7 +24,7 @@ else()
   set(MKL_ARCH ia32)
 endif()
 
-set(MKL_ROOT $ENV{MKLROOT} CACHE TYPE STRING)
+# set(MKL_ROOT $ENV{MKLROOT} CACHE TYPE STRING)
 
 if(NOT MKL_ROOT)
   set(MKL_ROOT "/opt/intel/mkl")
